@@ -339,7 +339,7 @@ impl crate::discord_bot::Handler {
                 {
                     let mut redis_connection = redis_connection_mutex.lock();
                     // Try to atomically set the meetup id
-                    redis::transaction(
+                    redis::transaction::<_, _, (), _>(
                         &mut *redis_connection,
                         &[&redis_key_d2m, &redis_key_m2d],
                         |con, pipe| {
@@ -408,7 +408,7 @@ impl crate::discord_bot::Handler {
         match linked_meetup_id {
             Some(meetup_id) => {
                 let redis_key_m2d = format!("meetup_user:{}:discord_user", meetup_id);
-                redis_connection.del(&[&redis_key_d2m, &redis_key_m2d])?;
+                redis_connection.del::<_, ()>(&[&redis_key_d2m, &redis_key_m2d])?;
                 let message = if is_organizer_command {
                     Cow::Owned(format!("Unlinked <@{}>'s Meetup account", user_id))
                 } else {
@@ -646,7 +646,7 @@ impl crate::discord_bot::Handler {
             if as_host {
                 let redis_channel_removed_hosts_key =
                     format!("discord_channel:{}:removed_hosts", msg.channel_id.0);
-                redis_connection.sadd(redis_channel_removed_hosts_key, discord_id)?;
+                redis_connection.sadd::<_, _, ()>(redis_channel_removed_hosts_key, discord_id)?;
             } else {
                 let redis_channel_removed_users_key =
                     format!("discord_channel:{}:removed_users", msg.channel_id.0);
