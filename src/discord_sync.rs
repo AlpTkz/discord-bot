@@ -288,7 +288,7 @@ fn sync_role(
             } else {
                 format!("discord_channel:{}:discord_role", channel_id.0)
             };
-            redis::transaction(redis_connection, &[&redis_channel_role_key], |con, pipe| {
+            redis::transaction::<_, _, (), _>(redis_connection, &[&redis_channel_role_key], |con, pipe| {
                 let current_role: Option<u64> = con.get(&redis_channel_role_key)?;
                 if current_role == Some(role.0) {
                     // Remove the broken role from Redis
@@ -458,7 +458,7 @@ fn sync_channel(
             let redis_channel_series_key = format!("discord_channel:{}:event_series", channel.0);
             let redis_series_channel_key =
                 format!("event_series:{}:discord_channel", event_series_id);
-            redis::transaction(
+            redis::transaction::<_, _, (), _>(
                 redis_connection,
                 &[&redis_series_channel_key],
                 |con, pipe| {

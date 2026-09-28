@@ -209,7 +209,7 @@ fn send_channel_expiration_reminder(
             message_builder.content(strings::END_OF_ADVENTURE_MESSAGE(bot_id))
         })?;
         let last_reminder_time = chrono::Utc::now().to_rfc3339();
-        con.set(&redis_channel_reminder_time, last_reminder_time)?;
+        con.set::<_, _, ()>(&redis_channel_reminder_time, last_reminder_time)?;
         println!(
             "Updated channel's {} latest expiration reminder time",
             channel_id
